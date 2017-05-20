@@ -1,9 +1,7 @@
 # SQL
 > 데이터베이스의 데이터를 저장, 조작 및 검색 하기 위한 표준 언어  
 
--
-
->DB, Table, Record, Field란?
+>\< DB, Table, Record, Field란? >
 ><img src="http://pccontrol.files.wordpress.com/2011/06/dbhirarcy1.jpg?w=300&h=124">
 
 
@@ -39,7 +37,7 @@ SELECT와 select 둘 다 동일하게 인식한다.
 - CREAT INDEX : 색인을 생성한다.
 - DROP INDEX : 색인을 삭제한다.
 
--
+
 
 ### SELECT
 SELECT는 데이터를 선택하는 데 사용한다.  
@@ -61,7 +59,7 @@ SELECT * FROM table_name;
 <img src="./img/01SELECT.png">
 Customer 테이블에서 CustomerName과 City열을 선택한 예시이다.
 
--
+
 
 ### DISTINT
 ```sql
@@ -77,7 +75,7 @@ SELECT DISTINCT City FROM Customers;
 <img src="./img/02DISTINCT.png">
 오른쪽 전체 데이터베이스의 테이블의 Customer의 레코드는 91이지만, 중복되지 않은 Country는 21개 임을 알 수 있다.
 
--
+
 
 ### WHERE clause
 ```sql
@@ -97,7 +95,7 @@ Customers 테이블에서, Contry의 레코드가 Mexico인 Customer를 모두 �
 
 >WHERE는 SELECT 외에, UPDATE나 DELETE에도 사용된다.
 
--
+
 
 ### WHERE 연산자
 아래의 연산자는 WHERE 절에서 사용이 가능하다.
@@ -115,7 +113,7 @@ Customers 테이블에서, Contry의 레코드가 Mexico인 Customer를 모두 �
  `IN`		|To specify multiple possible values for a column  
 
 
--
+
 
  
 ### AND, OR and NOT
@@ -152,7 +150,7 @@ WHERE NOT Country='Germany' AND NOT Country='USA';
 Country= Germany, Country = München  
 **두 조건 모두(AND) 만족하지 않는(NOT)** Customer의 모든 레코드를 출력
 
--
+
 
 ### ORDER BY KEYWORD
 
@@ -187,7 +185,7 @@ ORDER BY Country ASC, CustomerName DESC;
 1. Country를 기준으로 레코드가 오름차순으로 정렬된다.  
 2. CustomerName을 기준으로, **Country가 같은 레코드 끼리** 내림차순으로 정렬된다.
 
--
+
 
 ### INSERT INTO
 새로운 레코드를 테이블에 추가한다.
@@ -219,7 +217,7 @@ VALUES ('Cardinal', 'Tom B. Erichsen', 'Skagen 21', 'Stavanger', '4006', 'Norway
 >CustomerID column은 자동 증가 필드로, 새로운 레코드를 테이블에 삽입할 경우 자동으로 생성된다.  
 >(입력하지 않아도, 자동으로 생성된다.)
 
--
+
 
 ### UPDATE
 기존에 입력된 데이터를 수정한다.
@@ -246,7 +244,7 @@ UPDATE 후 Customer 테이블
 WHERE를 이용해 CustomerID=1 로 필터링 된 레코드에서 ContactName과 City 필드를 입력한 정보로 업데이트 하였다.
 >WHERE를 사용하지 않으면 해당 column의 전체 데이터가 수정되기 때문에, 전체를 바꿀 경우가 아니면 반드시 입력해야한다.
 
--
+
 
 
 ### DELETE
@@ -265,4 +263,3 @@ WHERE CustomerName='Alfreds Futterkiste'
 ```
 Customers 테이블에서, CustomerName이 Alfreds Futterkiste인 레코드를 삭제한다.
 
--
