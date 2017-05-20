@@ -1,5 +1,5 @@
 #
-from Running_time_decorator import running_time
+from running_time_decorator import running_time
 #import decorator python file
 
 @running_time

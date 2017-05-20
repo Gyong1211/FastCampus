@@ -1,7 +1,7 @@
 # SQL
 > 데이터베이스의 데이터를 저장, 조작 및 검색 하기 위한 표준 언어  
 
->\< DB, Table, Record, Field란? >
+>\< DB, Table, Record, Field란? ><br>
 ><img src="http://pccontrol.files.wordpress.com/2011/06/dbhirarcy1.jpg?w=300&h=124">
 
 
