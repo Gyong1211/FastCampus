@@ -1,7 +1,7 @@
 import random
 
 def bubblesort(list_):
-    for i in range(len(list_)):
+    for i in range(len(list_-1)):
         print(i,'번째 패스')
         for j in range(len(list_)-i-1):
             if list_[j]>list_[j+1]:
