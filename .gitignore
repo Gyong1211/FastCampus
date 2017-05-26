@@ -1,4 +1,5 @@
 *.DS_Store
 HTML_CSS
-Python/Practice/__pycache__
+__pycache__
 Python/Assignment_class
+.python-version
