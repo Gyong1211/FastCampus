@@ -23,7 +23,9 @@ while True:
                        "3. 전체 에피소드 저장\n"
                        "4. 특정 에피소드 저장\n"
                        "0. 웹툰 선택으로 되돌아가기\n")
+
         if choice == '0':
+        #0 입력시 바깥 while문(웹툰 선택창)으로 탈출
             break
 
         elif choice =='1':
@@ -51,6 +53,7 @@ while True:
 
             for episode in specific_page_episode_list:
                 print(episode)
+
             input('\n기능 선택 메뉴로 돌아가시려면 아무 문자나 입력하세요.\n')
 
         elif choice == '3':
@@ -58,9 +61,14 @@ while True:
             webtoon.crawl_all_episode()
 
         elif choice == '4':
-            episode_number = int(input('\n저장하실 에피소드를 입력하세요.\n>>>'))
-            print('\n지정한 에피소드 {}화를 저장합니다.\n'.format(episode_number))
+            episode_number_input = input('\n저장하실 에피소드를 입력하세요.\n(미입력시 최신화를 저장합니다.)\n>>>')
+            if episode_number_input == '':
+                episode_number = None
+            else:
+                episode_number = int(episode_number_input)
+            print('\n지정한 에피소드를 저장합니다.\n')
             webtoon.crawl_episode(episode_number)
+            input('\n기능 선택 메뉴로 돌아가시려면 아무 문자나 입력하세요.\n')
 
 
         else:
