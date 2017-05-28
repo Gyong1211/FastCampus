@@ -3,7 +3,8 @@
 .idea/
 *.swp
 Python/Assignment_class
-HTML_CSS
+HTML_CSS/
+Django/
 
 ### Django ###
 *.log
