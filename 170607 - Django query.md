@@ -184,3 +184,162 @@ Python 문법을 사용하여, QuerySet에 `LIMIT`과 `OFFSET`과 같은 SQL문�
 > ```python
 > Entry.objects.all()[:10:2]
 > ```
+
+### Field lookups
+원하는 field를 조회하기 위해서는 `filter()`, `exclude()`, `get()`을 사용한다.  
+키워드 인자로 사용하는 인수는 `field__lookuptype=value`의 형태를 띈다.
+
+```python
+Entry.objects.filter(pub_date__lte='2006-01-01'
+```
+
+위의 예시를 SQL문으로 바꾸면 아래와 같다.
+
+```SQL
+SELECT * FROM blog_entry WHERE pub_date <= '2006-01-01'
+```
+<br>
+
+###### lookup type
+
+- `exact` : 정확하게 값이 일치하는 객체를 찾음
+	
+	```python
+	Entry.objects.get(headline__exact = "Cat bites dog")
+	```
+	```
+	>>> Blog.objects.get(id__exact=14)  # Explicit form
+	>>> Blog.objects.get(id=14)         # __exact is implied
+	```
+	
+- `iexact` : 대소문자를 구분하지 않는 `exact`
+- `contains` : 해당 값이 포함된 객체를 찾음
+	
+	```python
+	Entry.objects.get(headline__contains='Lennon')
+	```
+	```sql
+	SELECT ... WHERE headline LIKE '%Lennon%';
+	```
+
+- `startswith`, `endswith` : 해당 값으로 시작/끝나는 객체를 찾음
+- `istartswith`, `iendswith` : 대소문자를 구분하지 않는 `startswith`, `endswith`
+
+### Lookups that span relationships
+
+Django는 자동으로 relationship을 SQL JOIN으로 처리하면서 해당 관계를 정리해둔다.
+
+해당 관계를 이용해서, 원하는 필드를 찾을 때 까지 두 모델 관련 필드의 이름을 `__`로 구분하여 사용하면 된다.
+
+```python
+>>> Blog.objects.filter(entry__headline__contains='Lennon')
+```
+
+해당 예제는 헤드라인에 `Lennon`이 포함된 `Entry`를 하나이상 가지고 있는 `Blog` 객체를 가져온다.
+
+#### Spanning multi-valued relationships
+
+```python
+Blog.objects.filter(entry__headline__contains='Lennon', entry__pub_date__year=2008)
+```
+두 조건 (`Lennon`을 포함한 헤드라인, `pub_date`의 년도가 2008년인 `Entry`를 가진)을 모두 만족하는 `Entry`를 가진 블로그를 얻기 위해서 `,`를 사용하면 된다.
+
+
+```python
+Blog.objects.filter(entry__headline__contains='Lennon').filter(entry__pub_date__year=2008)
+```
+`Lennon`을 포함한 헤드라인을 가진 `Entry`와 `pub_date`의 년도가 2008년인 `Entry`를 모두 가진 블로그를 얻기 위해서 filter chaining을 사용한다.
+
+### Filters can reference fields on the model
+
+모델의 필드 값과 상수를 비교하는 필터 외에, 같은 모델의 다른 필드와 비교하기 위해서 `F()`를 사용한다.
+
+```python
+>>> from django.db.models import F
+>>> Entry.objects.filter(n_comments__gt=F('n_pingbacks'))
+```
+
+위의 예제는 `n_comments`의 값이 `n_pingbacks`의 값보다 큰 `Entry` 객체를 찾는다.
+
+```python
+>>> Entry.objects.filter(n_comments__gt=F('n_pingbacks') * 2)
+```
+위의 예제처럼 `F()`객체에는 +,-,*,/,모듈러스, 지수연산을 사용할 수 있다.
+
+### Caching and QuerySets
+
+새로 생성 된 QuerySet에서 캐시는 비어 있다.  
+QuerySet이 처음 동작할 때(데이터베이스 쿼리가 발생할 때) Django는 쿼리 결과를 QuerySet의 캐시에 저장하고 명시 적으로 요청 된 결과를 반환한다. (예 : QuerySet이 반복되는 경우 다음 요소)
+
+```python
+>>> print([e.headline for e in Entry.objects.all()])
+>>> print([e.pub_date for e in Entry.objects.all()])
+```
+
+캐싱 동작을 염두해야하는 이유는, 위의 예제의 경우, 두개의 QuerySets을 만들고, 동작한 다음 해당 QuerySets를 버린다.
+
+또한 두 요청 사이에 시간차 사이에 데이터가 추가되거나 삭제 되었을 수도 있다.
+
+따라서 이러한 문제를 해결하기 위해서는, Queryset을 먼저 캐싱해 두어야 한다.
+
+```python
+>>> queryset = Entry.objects.all()
+>>> print([p.headline for p in queryset]) # Evaluate the query set.
+>>> print([p.pub_date for p in queryset]) # Re-use the cache from the evaluation.
+```
+<br>
+
+>Query는 항상 결과를 캐시하지 않는다.
+>QuerySet의 일부만 검사하는 경우 매번 DB에 접근한다.
+
+>```python
+>>>> queryset = Entry.objects.all()
+>>>> print(queryset[5]) # Queries the database
+>>>> print(queryset[5]) # Queries the database again
+>```
+>
+> 하지만 한번 캐싱한 다음, 일부를 검사하는 경우, DB대신 캐시에 접근한다.
+> 
+> ```python
+>>>> queryset = Entry.objects.all()
+>>>> [entry for entry in queryset] # Queries the database
+>>>> print(queryset[5]) # Uses cache
+>>>> print(queryset[5]) # Uses cache
+>``` 
+
+### Complex lookups with Q objects
+
+`filter()`의 조건에 `AND`나 `OR` 연산을 사용하고 싶은 경우 `Q()`를 사용한다.
+
+```python
+Poll.objects.get(
+    Q(question__startswith='Who'),
+    Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6))
+)
+```
+
+위의 예제는 아래 SQL문과 같다.
+
+```sql
+SELECT * from polls WHERE question LIKE 'Who%'
+    AND (pub_date = '2005-05-02' OR pub_date = '2005-05-06')
+```
+
+`Q()`와 키워드 인자를 섞어서 사용할 수 있다. 하지만 그런 경우 `Q()`가 키워드 인자보다 앞으로 나와 있어야한다.
+
+```python
+Poll.objects.get(
+    Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6)),
+    question__startswith='Who',
+)
+
+#위의 경우 가능
+```
+
+```python
+Poll.objects.get(
+    question__startswith='Who',
+    Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6))
+)
+#불가능
+```
