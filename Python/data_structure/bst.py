@@ -135,7 +135,24 @@ class BinarySearchTree(BinaryTree):
         return del_node
 
     def remove_one_child(self, parent, del_node):
-        pass
+        if self.get_left_sub_tree(parent) == del_node:
+            if self.get_left_sub_tree(del_node):
+                del_child = self.get_left_sub_tree(del_node)
+                self.make_left_sub_tree(parent, del_child)
+                return del_node
+            else:
+                del_child = self.get_right_sub_tree(del_node)
+                self.make_left_sub_tree(parent, del_child)
+                return del_node
+        else:
+            if self.get_left_sub_tree(del_node):
+                del_child = self.get_left_sub_tree(del_node)
+                self.make_right_sub_tree(parent, del_child)
+                return del_node
+            else:
+                del_child = self.get_right_sub_tree(del_node)
+                self.make_right_sub_tree(parent, del_child)
+                return del_node
 
     def remove_two_children(self, del_node):
         pass
